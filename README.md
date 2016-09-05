@@ -28,7 +28,7 @@ $sendSms->setTemplateParams([
   'param2' => 'var2',
 ]);
 $sendSms->setTemplate('template_id');
-$sendSms->setSmsMobile('13000000000);
+$sendSms->setSmsMobile('13000000000');
 $sendSms->send();
 ```
 

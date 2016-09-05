@@ -10,7 +10,7 @@
       "homepage": "https://github.com/softbread"
     }
   ],
-  "minimum-stability": "dev",
+  "minimum-stability": "stable",
   "require": {
     "php": ">=5.5.0",
     "guzzlehttp/guzzle": "~6.0"

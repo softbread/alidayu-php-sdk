@@ -67,7 +67,7 @@ class AliSms
         } else {
             $this->error = [
                 'code' => 0,
-                'msg' => 'HTTP_RESPONSE_NOT_WELL_FORMED'
+                'msg'  => 'HTTP_RESPONSE_NOT_WELL_FORMED',
             ];
         }
         return false;
@@ -89,7 +89,7 @@ class AliSms
     private function generateSignature($params)
     {
         ksort($params);
-
+        
         $paramString = '';
         foreach ($params as $k => $v) {
             if (is_string($v) && '@' != substr($v, 0, 1)) {
@@ -106,7 +106,7 @@ class AliSms
             'base_uri' => self::ALI_DAYU_REST_URL,
             'timeout'  => 5.0,
         ]);
-    
+        
         $response = null;
         try {
             $response = $client->request('GET', self::ALI_DAYU_REST_URL, $params);

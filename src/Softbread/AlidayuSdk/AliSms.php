@@ -17,10 +17,11 @@ class AliSms
     private $_key;
     private $_secret;
     private $_setting = [];
+    private $_restUrl;
     
-    public function __construct()
+    public function setEnv($isBlackbox = false)
     {
-        
+        $this->_restUrl = $isBlackbox ? self::ALI_DAYU_REST_TEST_URL : self::ALI_DAYU_REST_URL;
     }
     
     public function setKey($key)
@@ -103,13 +104,13 @@ class AliSms
     protected function sendRequest($params)
     {
         $client = new Client([
-            'base_uri' => self::ALI_DAYU_REST_URL,
+            'base_uri' => $this->_restUrl,
             'timeout'  => 5.0,
         ]);
         
         $response = null;
         try {
-            $response = $client->request('GET', self::ALI_DAYU_REST_URL, $params);
+            $response = $client->request('GET', $this->_restUrl, $params);
         } catch (ClientException $e) {
             return null;
         }

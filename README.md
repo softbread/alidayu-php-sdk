@@ -18,18 +18,37 @@ This project is inspired by another PHP curl reversion for Ali Dayu
 
 ##3. Typical Usage
 
+###a. Use setters:
 ```
 $sendSms = new Softbread\AlidayuSdk\AliSms;
-$sendSms->setKey('api_key');
-$sendSms->setSecret('api_secret');
-$sendSms->setSmsSign('sms_free_sign');
+$sendSms->setEnv(false); // use sandbox or not
+$sendSms->setKey('api_key'); // set API key
+$sendSms->setSecret('api_secret'); // set API secret
+$sendSms->setSmsSign('sms_free_sign'); // set free sign in SMS content
 $sendSms->setTemplateParams([
   'param1' => 'var1',
   'param2' => 'var2',
-]);
-$sendSms->setTemplate('template_id');
-$sendSms->setSmsMobile('13000000000');
+]); // set template params
+$sendSms->setTemplate('template_id'); // set template ID
+$sendSms->setSmsMobile('13000000000'); // set mobile number
 $sendSms->send();
+```
+
+###b. Use callable function for easier dependency injection
+```
+$sendSms = new Softbread\AlidayuSdk\AliSms;
+$sendSms->setEnv(false); // use sandbox (inject from config)
+$sendSms->setKey('api_key'); // set API key (inject from config)
+$sendSms->setSecret('api_secret'); // set API secret (inject from config)
+$sendSms->send(
+    '13000000000',  // mobile number
+    'sms_free_sign' , // free sign in SMS content
+    'template_id',  // template ID
+    [
+      'param1' => 'var1',
+      'param2' => 'var2',
+    ]  // template params
+);
 ```
 
 ##4. To-do

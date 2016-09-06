@@ -9,7 +9,7 @@ use GuzzleHttp\Exception\ClientException;
 class AliSms
 {
     const ALI_DAYU_REST_URL = 'https://eco.taobao.com/router/rest';
-    const ALI_DAYU_REST_TEST_URL = 'https://gw.api.tbsandbox.com/router/rest';
+    const ALI_DAYU_REST_SANDBOX_URL = 'https://gw.api.tbsandbox.com/router/rest';
     const ALI_DAYU_REST_VERSION = '2.0';
     const ALI_DAYU_METHOD_SEND_SMS = 'alibaba.aliqin.fc.sms.num.send';
     
@@ -19,9 +19,11 @@ class AliSms
     private $_setting = [];
     private $_restUrl;
     
-    public function setEnv($isBlackbox = false)
+    public function setEnv($useSandbox = false)
     {
-        $this->_restUrl = $isBlackbox ? self::ALI_DAYU_REST_TEST_URL : self::ALI_DAYU_REST_URL;
+        $this->_restUrl = $useSandbox
+            ? self::ALI_DAYU_REST_SANDBOX_URL
+            : self::ALI_DAYU_REST_URL;
     }
     
     public function setKey($key)
@@ -34,14 +36,14 @@ class AliSms
         $this->_secret = $secret;
     }
     
+    public function setSmsMobile($mobile = '')
+    {
+        $this->_setting['rec_num'] = $mobile;
+    }
+    
     public function setSmsSign($sign = '')
     {
         $this->_setting['sms_free_sign_name'] = $sign;
-    }
-    
-    public function setTemplateParams($params = [])
-    {
-        $this->_setting['sms_param'] = json_encode($params);
     }
     
     public function setTemplate($code = '')
@@ -49,14 +51,14 @@ class AliSms
         $this->_setting['sms_template_code'] = $code;
     }
     
-    public function setSmsMobile($mobile = '')
+    public function setTemplateParams($params = [])
     {
-        $this->_setting['rec_num'] = $mobile;
+        $this->_setting['sms_param'] = json_encode($params);
     }
     
-    public function send()
+    public function send($smsMobile = '', $smsSign = '', $template = '', $templateParams = [])
     {
-        $params = $this->loadAllParams();
+        $params = $this->loadAllParams($smsMobile, $smsSign, $template, $templateParams);
         $params['sign'] = $this->generateSignature($params);
         
         $reponse = $this->sendRequest($params);
@@ -74,8 +76,15 @@ class AliSms
         return false;
     }
     
-    private function loadAllParams()
+    private function loadAllParams($smsMobile, $smsSign, $template, $templateParams)
     {
+        if ($smsMobile !== '' && $smsSign !== '' && $template !== '') {
+            $this->setSmsMobile($smsMobile);
+            $this->setSmsSign($smsSign);
+            $this->setTemplate($template);
+            $this->setTemplateParams($templateParams);
+        }
+        
         return [
             'app_key'     => $this->_key,
             'format'      => 'json',

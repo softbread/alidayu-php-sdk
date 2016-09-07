@@ -36,36 +36,45 @@ class AliSms
         $this->_secret = $secret;
     }
     
-    public function setSmsMobile($mobile = '')
-    {
-        $this->_setting['rec_num'] = $mobile;
-    }
-    
-    public function setSmsSign($sign = '')
-    {
-        $this->_setting['sms_free_sign_name'] = $sign;
-    }
-    
-    public function setTemplate($code = '')
-    {
-        $this->_setting['sms_template_code'] = $code;
-    }
-    
-    public function setTemplateParams($params = [])
-    {
-        $this->_setting['sms_param'] = json_encode($params);
-    }
-    
     public function send($smsMobile = '', $smsSign = '', $template = '', $templateParams = [])
     {
         $params = $this->loadAllParams($smsMobile, $smsSign, $template, $templateParams);
         $params['sign'] = $this->generateSignature($params);
         
         $reponse = $this->sendRequest($params);
+        
+        /**
+         * an example of successful response:
+         *  {
+         *      "alibaba_aliqin_fc_sms_num_send_response":{
+         *          "result":{
+         *              "err_code":"0",
+         *              "model":"102855647538^1103588732593",
+         *              "success":true
+         *          },
+         *          "request_id":"43w7m1k7a0e7"
+         *      }
+         *  }
+         *
+         *  an example of failed response:
+         *  {
+         *      "error_response":{
+         *          "code":15,
+         *          "msg":"Remote service error",
+         *          "sub_code":"isv.SMS_SIGNATURE_ILLEGAL",
+         *          "sub_msg":"短信签名不合法",
+         *          "request_id":"101ynzojsl1cw"
+         *      }
+         *  }
+         */
         if ($reponse !== null) {
             $res = json_decode($reponse, true);
             $res = array_pop($res);
-            if (isset($res['result'])) return true;
+            if (isset($res['result'])) {
+                if (isset($res['result']['success']) && $res['result']['success'] === true) {
+                    return true;
+                }
+            }
             $this->error = $res;
         } else {
             $this->error = [
@@ -96,6 +105,26 @@ class AliSms
         ] + $this->_setting;
     }
     
+    public function setSmsMobile($mobile = '')
+    {
+        $this->_setting['rec_num'] = $mobile;
+    }
+    
+    public function setSmsSign($sign = '')
+    {
+        $this->_setting['sms_free_sign_name'] = $sign;
+    }
+    
+    public function setTemplate($code = '')
+    {
+        $this->_setting['sms_template_code'] = $code;
+    }
+    
+    public function setTemplateParams($params = [])
+    {
+        $this->_setting['sms_param'] = json_encode($params);
+    }
+    
     private function generateSignature($params)
     {
         ksort($params);
@@ -119,7 +148,13 @@ class AliSms
         
         $response = null;
         try {
-            $response = $client->request('GET', $this->_restUrl, $params);
+            $response = $client->request(
+                'GET',
+                $this->_restUrl,
+                [
+                    'query' => http_build_query($params),
+                ]
+            );
         } catch (ClientException $e) {
             return null;
         }

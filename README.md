@@ -36,10 +36,12 @@ $sendSms->send();
 
 ###b. Use callable function for easier dependency injection
 ```
-$sendSms = new Softbread\AlidayuSdk\AliSms;
-$sendSms->setEnv(false); // use sandbox (inject from config)
-$sendSms->setKey('api_key'); // set API key (inject from config)
-$sendSms->setSecret('api_secret'); // set API secret (inject from config)
+$sendSms = new Softbread\AlidayuSdk\AliSms([
+    'env'    => false,
+    'key'    => 'api_key',
+    'secret' => 'api_secret',
+]); // inject config as array
+
 $sendSms->send(
     '13000000000',  // mobile number
     'sms_free_sign' , // free sign in SMS content

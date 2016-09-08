@@ -19,6 +19,15 @@ class AliSms
     private $_setting = [];
     private $_restUrl;
     
+    public function __construct($config = [])
+    {
+        if (count($config) === 3) {
+            $this->setEnv($config['env']);
+            $this->setKey($config['key']);
+            $this->setSecret($config['secret']);
+        }
+    }
+    
     public function setEnv($useSandbox = false)
     {
         $this->_restUrl = $useSandbox
